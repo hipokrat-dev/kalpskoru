@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kalp Sağlığı Risk Değerlendirmesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0f1118;--card:#181b25;--accent:#e63946;--accent-light:#ff6b6b;--accent-glow:rgba(230,57,70,0.25);--green:#2ec4b6;--green-glow:rgba(46,196,182,0.25);--yellow:#f4a261;--blue:#6c9fff;--text:#e8e8ed;--text-dim:#8b8fa3;--border:#2a2d3a;--input-bg:#12141c;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 20% 20%,rgba(230,57,70,0.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(46,196,182,0.04) 0%,transparent 50%);z-index:0;}
+  .container{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:20px 16px 32px;}
+
+  /* FORM */
+  #formScreen{transition:opacity 0.4s,transform 0.4s;}
+  #formScreen.hiding{opacity:0;transform:translateY(-20px);pointer-events:none;}
+  .header{text-align:center;margin-bottom:24px;animation:fadeUp 0.6s ease-out;}
+  .heart-anim-wrap{width:80px;height:80px;margin:0 auto 12px;position:relative;}
+  .heart-anim-wrap .glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,0.3) 0%,transparent 70%);animation:glowP 1.8s ease-in-out infinite;}
+  @keyframes glowP{0%,100%{transform:translate(-50%,-50%) scale(0.8);opacity:0.4;}30%{transform:translate(-50%,-50%) scale(1.3);opacity:0.7;}60%{transform:translate(-50%,-50%) scale(1);opacity:0.5;}}
+  .heart-svg-main{width:44px;height:44px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:hb 1.8s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(230,57,70,0.5));}
+  @keyframes hb{0%,100%{transform:translate(-50%,-50%) scale(1);}12%{transform:translate(-50%,-50%) scale(1.25);}24%{transform:translate(-50%,-50%) scale(1);}36%{transform:translate(-50%,-50%) scale(1.15);}48%{transform:translate(-50%,-50%) scale(1);}}
+  .ecg-line{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:76px;height:18px;overflow:hidden;}
+  .ecg-line svg{width:152px;height:18px;animation:ecg 2.4s linear infinite;}
+  @keyframes ecg{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+  .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--accent-light);opacity:0;animation:pf 3s ease-in-out infinite;}
+  .particle:nth-child(1){top:18%;left:12%;animation-delay:0s;}.particle:nth-child(2){top:8%;right:16%;animation-delay:0.7s;}.particle:nth-child(3){bottom:20%;left:8%;animation-delay:1.4s;}.particle:nth-child(4){top:28%;right:8%;animation-delay:0.3s;}
+  @keyframes pf{0%{opacity:0;transform:translateY(0) scale(0.5);}20%{opacity:0.7;}50%{opacity:0.5;transform:translateY(-14px) scale(1);}100%{opacity:0;transform:translateY(-28px) scale(0.3);}}
+
+  .header h1{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;letter-spacing:-0.02em;line-height:1.2;background:linear-gradient(135deg,#fff,#c8c8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;}
+  .header p{color:var(--text-dim);font-size:0.82rem;line-height:1.5;}
+
+  .section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;animation:fadeUp 0.6s ease-out;}
+  .section-title{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+  .section-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .form-group{display:flex;flex-direction:column;gap:4px;}
+  label{font-size:0.75rem;font-weight:600;color:var(--text-dim);}
+  input[type="number"]{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:all 0.3s;-moz-appearance:textfield;width:100%;}
+  input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow);}
+  .bmi-display{margin-top:8px;padding:10px 14px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s;}
+  .bmi-display.risk-low{border-color:rgba(46,196,182,0.4);}.bmi-display.risk-mid{border-color:rgba(244,162,97,0.4);}.bmi-display.risk-high{border-color:rgba(230,57,70,0.4);}
+  .bmi-label{font-size:0.78rem;color:var(--text-dim);}.bmi-value{font-size:1.2rem;font-weight:700;font-family:'Playfair Display',serif;}.bmi-category{font-size:0.72rem;font-weight:600;margin-top:1px;}
+  .toggle-group{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+  .toggle-group:last-child{border-bottom:none;}
+  .toggle-label{font-size:0.84rem;font-weight:500;}.toggle-sublabel{font-size:0.72rem;color:var(--text-dim);margin-top:1px;}
+  .toggle{position:relative;width:42px;height:24px;flex-shrink:0;}.toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:24px;transition:0.3s;}
+  .toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s;}
+  .toggle input:checked+.toggle-slider{background:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
+  .toggle input:checked+.toggle-slider::before{transform:translateX(18px);}
+  .sub-toggle-row{display:none;padding:8px 0 8px 16px;border-bottom:1px solid var(--border);align-items:center;justify-content:space-between;background:rgba(46,196,182,0.03);margin:0 -18px;padding-left:34px;padding-right:18px;}
+  .sub-toggle-row.visible{display:flex;}
+  .sub-toggle-row .toggle-label{font-size:0.78rem;color:var(--green);}
+  .sub-toggle-row .toggle input:checked+.toggle-slider{background:var(--green);box-shadow:0 0 10px rgba(46,196,182,0.25);}
+  .calc-btn{width:100%;padding:14px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),#c1121f);border:none;border-radius:12px;cursor:pointer;transition:all 0.3s;margin-top:6px;}
+  .calc-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px var(--accent-glow);}
+  .disclaimer-form{text-align:center;font-size:0.65rem;color:var(--text-dim);margin-top:16px;opacity:0.5;}
+
+  /* ===== RESULT ===== */
+  #resultScreen{display:none;opacity:0;transform:translateY(20px);transition:opacity 0.5s,transform 0.5s;}
+  #resultScreen.visible{display:flex;flex-direction:column;}
+  #resultScreen.show{opacity:1;transform:translateY(0);}
+
+  .result-top{text-align:center;padding:12px 0 8px;flex-shrink:0;}
+
+  /* Small animated heart for result */
+  .rh-mini{width:56px;height:56px;margin:0 auto 10px;position:relative;}
+  .rh-mini .glow-r{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;animation:glowP 1.8s ease-in-out infinite;}
+  .rh-mini.risk .glow-r{background:radial-gradient(circle,rgba(230,57,70,0.35) 0%,transparent 70%);}
+  .rh-mini.ok .glow-r{background:radial-gradient(circle,rgba(46,196,182,0.35) 0%,transparent 70%);}
+  .rh-mini .rh-svg{width:32px;height:32px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:hb 1.8s ease-in-out infinite;}
+  .rh-mini.risk .rh-svg{filter:drop-shadow(0 0 10px rgba(230,57,70,0.6));}
+  .rh-mini.ok .rh-svg{filter:drop-shadow(0 0 10px rgba(46,196,182,0.6));}
+  .rh-mini .rh-ecg{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:52px;height:14px;overflow:hidden;}
+  .rh-mini .rh-ecg svg{width:104px;height:14px;animation:ecg 2.4s linear infinite;}
+
+  .hero-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;line-height:1.3;margin-bottom:4px;}
+  .hero-title.risk-text{color:var(--accent-light);}.hero-title.ok-text{color:var(--green);}
+  .hero-desc{font-size:0.82rem;color:var(--text-dim);line-height:1.5;max-width:400px;margin:0 auto;}
+  .hero-desc.warning{font-size:0.95rem;font-weight:700;color:var(--accent-light);margin-top:6px;}
+
+  /* Score bar card */
+  .score-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin:14px 0;animation:fadeUp 0.6s ease-out;}
+  .score-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .score-label{font-size:0.78rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;}
+  .score-num{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;line-height:1;}
+  .score-num.low{color:var(--green);}.score-num.mid{color:var(--yellow);}.score-num.high{color:var(--accent-light);}
+  .score-max{font-size:0.85rem;font-weight:600;color:var(--text-dim);}
+  .score-bar-bg{width:100%;height:10px;background:var(--border);border-radius:10px;overflow:hidden;position:relative;}
+  .score-bar-fill{height:100%;border-radius:10px;width:0;transition:width 1.2s cubic-bezier(0.22,1,0.36,1) 0.3s;}
+  .score-bar-fill.low{background:linear-gradient(90deg,#1a8a7d,var(--green));box-shadow:0 0 12px var(--green-glow);}
+  .score-bar-fill.mid{background:linear-gradient(90deg,#d4883a,var(--yellow));box-shadow:0 0 12px rgba(244,162,97,0.3);}
+  .score-bar-fill.high{background:linear-gradient(90deg,#c1121f,var(--accent-light));box-shadow:0 0 12px var(--accent-glow);}
+  .score-dots{display:flex;justify-content:space-between;margin-top:8px;}
+  .score-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background 0.3s,box-shadow 0.3s;}
+  .score-dot.filled.low{background:var(--green);box-shadow:0 0 6px var(--green-glow);}
+  .score-dot.filled.mid{background:var(--yellow);box-shadow:0 0 6px rgba(244,162,97,0.3);}
+  .score-dot.filled.high{background:var(--accent);box-shadow:0 0 6px var(--accent-glow);}
+  .score-level-tag{display:inline-block;margin-top:10px;padding:4px 14px;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
+  .score-level-tag.low{background:rgba(46,196,182,0.12);color:var(--green);}
+  .score-level-tag.mid{background:rgba(244,162,97,0.12);color:var(--yellow);}
+  .score-level-tag.high{background:rgba(230,57,70,0.12);color:var(--accent-light);}
+
+  /* Expandable */
+  .expand-section{flex-shrink:0;}
+  .expand-btn{width:100%;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.3s;margin-bottom:8px;}
+  .expand-btn:hover{border-color:#3a3d4a;}
+  .expand-btn-left{display:flex;align-items:center;gap:10px;}
+  .expand-btn-icon{font-size:1rem;}.expand-btn-text{font-size:0.84rem;font-weight:600;color:var(--text);}
+  .expand-btn-count{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:12px;}
+  .expand-btn-count.risk{background:rgba(230,57,70,0.15);color:var(--accent-light);}
+  .expand-btn-count.ok{background:rgba(46,196,182,0.15);color:var(--green);}
+  .expand-btn-count.treat{background:rgba(108,159,255,0.15);color:var(--blue);}
+  .expand-arrow{color:var(--text-dim);font-size:0.8rem;transition:transform 0.3s;}
+  .expand-btn.open .expand-arrow{transform:rotate(180deg);}
+  .expand-content{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
+  .expand-content.open{max-height:2000px;}
+
+  .factor-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--card);}
+  .factor-row:first-child{border-radius:10px 10px 0 0;}.factor-row:last-child{border-radius:0 0 10px 10px;border-bottom:none;}.factor-row:only-child{border-radius:10px;}
+  .factor-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+  .factor-icon.risk{background:rgba(230,57,70,0.12);}.factor-icon.ok{background:rgba(46,196,182,0.12);}.factor-icon.treated{background:rgba(108,159,255,0.12);}
+  .factor-content{flex:1;min-width:0;}.factor-text{font-size:0.82rem;color:var(--text);font-weight:500;}.factor-explain{font-size:0.72rem;color:var(--text-dim);line-height:1.4;margin-top:3px;}
+  .factor-badge{font-size:0.62rem;font-weight:700;padding:3px 8px;border-radius:12px;text-transform:uppercase;flex-shrink:0;margin-top:2px;}
+  .factor-badge.risk{background:rgba(230,57,70,0.15);color:var(--accent-light);}.factor-badge.ok{background:rgba(46,196,182,0.15);color:var(--green);}.factor-badge.treated{background:rgba(108,159,255,0.15);color:var(--blue);}
+
+  .alert-card{padding:14px 16px;border-radius:10px;margin-bottom:8px;}
+  .alert-card.doctor{background:linear-gradient(135deg,#3b1520,#2d1018);border:1.5px solid rgba(230,57,70,0.35);}
+  .alert-card.treatment{background:linear-gradient(135deg,#141a2e,#161d30);border:1px solid rgba(108,159,255,0.3);}
+  .alert-card h4{font-size:0.85rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .alert-card.doctor h4{color:var(--accent-light);}.alert-card.treatment h4{color:var(--blue);}
+  .alert-card p{font-size:0.78rem;color:var(--text-dim);line-height:1.5;margin-bottom:6px;}
+  .alert-card ul{list-style:none;padding:0;}.alert-card ul li{font-size:0.76rem;color:var(--text);padding:3px 0 3px 14px;position:relative;}
+  .alert-card.doctor ul li::before{content:'•';color:var(--accent-light);font-weight:700;position:absolute;left:0;}
+  .alert-card.treatment ul li::before{content:'•';color:var(--blue);font-weight:700;position:absolute;left:0;}
+
+  .back-btn{width:100%;padding:12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:var(--text-dim);background:var(--card);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.3s;margin-top:8px;}
+  .back-btn:hover{border-color:var(--accent);color:var(--text);}
+  .disclaimer-result{text-align:center;font-size:0.62rem;color:var(--text-dim);margin-top:10px;opacity:0.4;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  @media(max-width:520px){.container{padding:16px 12px 24px;}.header{margin-bottom:16px;}.header h1{font-size:1.4rem;}.section{padding:14px;margin-bottom:10px;}.form-row{gap:10px;}.toggle-group{padding:8px 0;}.sub-toggle-row{margin:0 -14px;padding-left:28px;padding-right:14px;}.calc-btn{padding:12px;font-size:0.9rem;}.heart-anim-wrap{width:64px;height:64px;}.heart-svg-main{width:36px;height:36px;}.ecg-line{width:60px;height:14px;}.ecg-line svg{width:120px;height:14px;}.hero-title{font-size:1.1rem;}.score-num{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- FORM -->
+  <div id="formScreen">
+    <div class="header">
+      <div class="heart-anim-wrap">
+        <div class="glow"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <svg class="heart-svg-main" viewBox="0 0 24 24" fill="#e63946"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="ecg-line"><svg viewBox="0 0 200 24" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5"><polyline points="0,12 15,12 20,12 25,2 30,22 35,8 40,16 45,12 60,12 75,12 80,12 85,2 90,22 95,8 100,16 105,12 120,12 135,12 140,12 145,2 150,22 155,8 160,16 165,12 180,12 200,12"/></svg></div>
+      </div>
+      <h1>Kalp Sağlığı Risk Değerlendirmesi</h1>
+      <p>Bilgilerinizi girerek kardiyovasküler risk profilinizi öğrenin.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Değiştirilemez Risk Faktörleri</div>
+      <div class="form-group" style="max-width:160px;margin-bottom:12px;"><label>Yaş</label><input type="number" id="age" placeholder="Ör: 52" min="18" max="100"></div>
+      <div class="toggle-group"><div><div class="toggle-label">Aile Öyküsü</div><div class="toggle-sublabel">Birinci derece akrabada kardiyovasküler hastalık</div></div><label class="toggle"><input type="checkbox" id="familyHistory"><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Vücut Kitle İndeksi (VKİ)</div>
+      <div class="form-row">
+        <div class="form-group"><label>Boy (cm)</label><input type="number" id="height" placeholder="175" min="120" max="220" oninput="calcBMI()"></div>
+        <div class="form-group"><label>Kilo (kg)</label><input type="number" id="weight" placeholder="82" min="30" max="250" oninput="calcBMI()"></div>
+      </div>
+      <div class="bmi-display" id="bmiDisplay"><div><div class="bmi-label">VKİ</div><div class="bmi-category" id="bmiCategory" style="color:var(--text-dim)">Boy ve kilo giriniz</div></div><div class="bmi-value" id="bmiValue" style="color:var(--text-dim)">—</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Değiştirilebilir Risk Faktörleri</div>
+      <div class="toggle-group"><div><div class="toggle-label">Yüksek Tansiyon</div></div><label class="toggle"><input type="checkbox" id="hypertension" onchange="toggleSub('hypertension','htTreat')"><span class="toggle-slider"></span></label></div>
+      <div class="sub-toggle-row" id="htTreat"><div><div class="toggle-label">💊 Tedavi alıyorum</div></div><label class="toggle"><input type="checkbox" id="htTreatCheck"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Yüksek Kolesterol</div></div><label class="toggle"><input type="checkbox" id="cholesterol" onchange="toggleSub('cholesterol','cholTreat')"><span class="toggle-slider"></span></label></div>
+      <div class="sub-toggle-row" id="cholTreat"><div><div class="toggle-label">💊 Tedavi alıyorum</div></div><label class="toggle"><input type="checkbox" id="cholTreatCheck"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Yüksek Şeker (Diyabet)</div></div><label class="toggle"><input type="checkbox" id="diabetes" onchange="toggleSub('diabetes','diabTreat')"><span class="toggle-slider"></span></label></div>
+      <div class="sub-toggle-row" id="diabTreat"><div><div class="toggle-label">💊 Tedavi alıyorum</div></div><label class="toggle"><input type="checkbox" id="diabTreatCheck"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Sigara Kullanımı</div></div><label class="toggle"><input type="checkbox" id="smoking"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Fiziksel İnaktivite</div></div><label class="toggle"><input type="checkbox" id="sedentary"><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <button class="calc-btn" onclick="calculateRisk()">❤️ Riskimi Hesapla</button>
+    <div class="disclaimer-form">Genel bilgilendirme amaçlıdır. Tıbbi teşhis yerine geçmez.</div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultScreen">
+    <div class="result-top" id="resultTop"></div>
+    <div id="scoreArea"></div>
+    <div class="expand-section" id="expandArea"></div>
+    <button class="back-btn" onclick="goBack()">← Tekrar Değerlendir</button>
+    <div class="disclaimer-result">Genel bilgilendirme amaçlıdır. Tıbbi teşhis yerine geçmez.</div>
+  </div>
+</div>
+
+<script>
+function calcBMI(){
+  const h=parseInt(document.getElementById('height').value),w=parseInt(document.getElementById('weight').value);
+  const v=document.getElementById('bmiValue'),c=document.getElementById('bmiCategory'),b=document.getElementById('bmiDisplay');
+  if(!h||!w||h<100||w<20){v.textContent='—';v.style.color='var(--text-dim)';c.textContent='Boy ve kilo giriniz';c.style.color='var(--text-dim)';b.className='bmi-display';return;}
+  const bmi=w/((h/100)**2),r=bmi.toFixed(1);v.textContent=r;
+  if(bmi<18.5){c.textContent='Zayıf';c.style.color='var(--yellow)';v.style.color='var(--yellow)';b.className='bmi-display risk-mid';}
+  else if(bmi<25){c.textContent='Normal';c.style.color='var(--green)';v.style.color='var(--green)';b.className='bmi-display risk-low';}
+  else if(bmi<30){c.textContent='Kilolu';c.style.color='var(--yellow)';v.style.color='var(--yellow)';b.className='bmi-display risk-mid';}
+  else if(bmi<35){c.textContent='Obez';c.style.color='var(--accent-light)';v.style.color='var(--accent-light)';b.className='bmi-display risk-high';}
+  else{c.textContent='Ciddi Obez';c.style.color='var(--accent)';v.style.color='var(--accent)';b.className='bmi-display risk-high';}
+}
+function toggleSub(m,s){const r=document.getElementById(s);if(document.getElementById(m).checked)r.classList.add('visible');else{r.classList.remove('visible');r.querySelector('input[type=checkbox]').checked=false;}}
+function toggleExpand(btn,id){btn.classList.toggle('open');document.getElementById(id).classList.toggle('open');}
+
+function miniHeart(color){
+  return `<div class="glow-r"></div>
+    <svg class="rh-svg" viewBox="0 0 24 24" fill="${color}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <div class="rh-ecg"><svg viewBox="0 0 200 24" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.4"><polyline points="0,12 15,12 20,12 25,2 30,22 35,8 40,16 45,12 60,12 75,12 80,12 85,2 90,22 95,8 100,16 105,12 120,12 135,12 140,12 145,2 150,22 155,8 160,16 165,12 180,12 200,12"/></svg></div>`;
+}
+
+function calculateRisk(){
+  const age=parseInt(document.getElementById('age').value);
+  if(!age){alert('Lütfen yaşınızı giriniz.');return;}
+  const h=parseInt(document.getElementById('height').value),w=parseInt(document.getElementById('weight').value);
+  const fH=document.getElementById('familyHistory').checked;
+  const ht=document.getElementById('hypertension').checked,htT=document.getElementById('htTreatCheck').checked;
+  const ch=document.getElementById('cholesterol').checked,chT=document.getElementById('cholTreatCheck').checked;
+  const db=document.getElementById('diabetes').checked,dbT=document.getElementById('diabTreatCheck').checked;
+  const sm=document.getElementById('smoking').checked,sd=document.getElementById('sedentary').checked;
+
+  let hasRisk=false;const maxP=8;let score=0;
+  const unc=[],chg=[],doc=[],trt=[];
+
+  if(age>=40){hasRisk=true;score++;unc.push({t:`Yaş: ${age}`,ex:'40 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
+  else unc.push({t:`Yaş: ${age}`,ex:'40 yaş altı — yaşa bağlı risk düşük.',s:'ok'});
+
+  if(fH){hasRisk=true;score++;unc.push({t:'Aile Öyküsü: Var',ex:'Ailede kalp hastalığı öyküsü genetik yatkınlık nedeniyle riskinizi artırır.',s:'risk'});}
+  else unc.push({t:'Aile Öyküsü: Yok',ex:'',s:'ok'});
+
+  if(ht){if(htT){chg.push({t:'Tansiyon — Tedavi Altında',ex:'Hedef değerlerde olduğunuzdan emin olun.',s:'treated'});trt.push('Tansiyon — düzenli ölçüm ve hedef takibi');}else{hasRisk=true;score++;chg.push({t:'Yüksek Tansiyon',ex:'Damar duvarlarına zarar vererek kalp krizi riskini artırır.',s:'risk'});doc.push('Yüksek tansiyon — tedavi değerlendirmesi');}}
+  else chg.push({t:'Tansiyon: Normal',ex:'',s:'ok'});
+
+  if(ch){if(chT){chg.push({t:'Kolesterol — Tedavi Altında',ex:'LDL hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Kolesterol — lipid profili kontrolü');}else{hasRisk=true;score++;chg.push({t:'Yüksek Kolesterol',ex:'Damar tıkanıklığına zemin hazırlar.',s:'risk'});doc.push('Yüksek kolesterol — tedavi planı');}}
+  else chg.push({t:'Kolesterol: Normal',ex:'',s:'ok'});
+
+  if(db){if(dbT){chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;score++;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
+  else chg.push({t:'Kan Şekeri: Normal',ex:'',s:'ok'});
+
+  if(h&&w&&h>=100&&w>=20){const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
+  else chg.push({t:'VKİ: Girilmedi',ex:'',s:'ok'});
+
+  if(sm){hasRisk=true;score++;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
+  else chg.push({t:'Sigara: Yok',ex:'',s:'ok'});
+
+  if(sd){hasRisk=true;score++;chg.push({t:'Fiziksel İnaktivite',ex:'Birçok risk faktörünü dolaylı artırır.',s:'risk'});doc.push('İnaktivite — egzersiz planı');}
+  else chg.push({t:'Aktif Yaşam',ex:'',s:'ok'});
+
+  const riskCount=score;
+  let lvlClass=score<=2?'low':score<=5?'mid':'high';
+  let lvlText=score<=2?'Düşük Risk':score<=5?'Orta Risk':'Yüksek Risk';
+
+  // Render
+  const form=document.getElementById('formScreen'),result=document.getElementById('resultScreen');
+  form.classList.add('hiding');
+  setTimeout(()=>{
+    form.style.display='none';result.classList.add('visible');window.scrollTo({top:0,behavior:'auto'});
+    setTimeout(()=>{
+      result.classList.add('show');
+
+      // Mini heart + title
+      const top=document.getElementById('resultTop');
+      if(hasRisk){
+        top.innerHTML=`<div class="rh-mini risk">${miniHeart('#e63946')}</div>
+          <div class="hero-title risk-text">Kalp ve Damar Hastalıkları Açısından Riskleriniz Mevcut</div>
+          <div class="hero-desc warning">Risklerinizle ilgili doktorunuzla görüşmeyi unutmayın.</div>`;
+      } else {
+        top.innerHTML=`<div class="rh-mini ok">${miniHeart('#2ec4b6')}</div>
+          <div class="hero-title ok-text">Risk Faktörünüz Bulunmuyor!</div>
+          <div class="hero-desc">Yıllık sağlık kontrollerinizi olmayı ihmal etmeyin.</div>`;
+      }
+
+      // Score card
+      const dots=Array.from({length:maxP},(_, i)=>{
+        const filled=i<score;
+        return `<div class="score-dot${filled?' filled '+lvlClass:''}"></div>`;
+      }).join('');
+
+      document.getElementById('scoreArea').innerHTML=`
+        <div class="score-card">
+          <div class="score-header">
+            <span class="score-label">Risk Skoru</span>
+            <div><span class="score-num ${lvlClass}" id="animNum">0</span><span class="score-max"> / ${maxP}</span></div>
+          </div>
+          <div class="score-bar-bg"><div class="score-bar-fill ${lvlClass}" id="scoreBar"></div></div>
+          <div class="score-dots">${dots}</div>
+          <div style="text-align:center;margin-top:4px;"><span class="score-level-tag ${lvlClass}">${lvlText}</span></div>
+        </div>`;
+
+      // Animate bar & number
+      setTimeout(()=>{
+        document.getElementById('scoreBar').style.width=(score/maxP*100)+'%';
+        const numEl=document.getElementById('animNum');
+        let cur=0;
+        const cnt=setInterval(()=>{cur++;if(cur>=score){cur=score;clearInterval(cnt);}numEl.textContent=cur;},100);
+      },100);
+
+      // Expandable sections
+      const area=document.getElementById('expandArea');
+      let html='';
+
+      const rBadge=riskCount>0?`<span class="expand-btn-count risk">${riskCount} risk</span>`:`<span class="expand-btn-count ok">Temiz</span>`;
+      html+=`<div class="expand-btn" onclick="toggleExpand(this,'detailC')"><div class="expand-btn-left"><span class="expand-btn-icon">📋</span><span class="expand-btn-text">Risk Detayları</span>${rBadge}</div><span class="expand-arrow">▼</span></div><div class="expand-content" id="detailC"><div class="expand-inner">`;
+
+      function fHTML(list){return list.map(f=>{let c=f.s==='risk'?'risk':f.s==='treated'?'treated':'ok';let e=f.s==='risk'?'⚠️':f.s==='treated'?'💊':'✓';let b=f.s==='risk'?'Risk':f.s==='treated'?'Tedavide':'Normal';return `<div class="factor-row"><div class="factor-icon ${c}">${e}</div><div class="factor-content"><div class="factor-text">${f.t}</div>${f.ex?`<div class="factor-explain">${f.ex}</div>`:''}</div><div class="factor-badge ${c}">${b}</div></div>`;}).join('');}
+      html+=fHTML(unc)+fHTML(chg)+'</div></div>';
+
+      if(doc.length>0){html+=`<div class="expand-btn" onclick="toggleExpand(this,'docC')"><div class="expand-btn-left"><span class="expand-btn-icon">🚨</span><span class="expand-btn-text">Doktor Önerileri</span><span class="expand-btn-count risk">${doc.length}</span></div><span class="expand-arrow">▼</span></div><div class="expand-content" id="docC"><div class="expand-inner"><div class="alert-card doctor"><h4>🚨 Doktorunuzdan Destek Alın!</h4><p>Aşağıdaki konularda hekime başvurunuz:</p><ul>${doc.map(d=>`<li>${d}</li>`).join('')}</ul></div></div></div>`;}
+
+      if(trt.length>0){html+=`<div class="expand-btn" onclick="toggleExpand(this,'trtC')"><div class="expand-btn-left"><span class="expand-btn-icon">💊</span><span class="expand-btn-text">Tedavi Takibi</span><span class="expand-btn-count treat">${trt.length}</span></div><span class="expand-arrow">▼</span></div><div class="expand-content" id="trtC"><div class="expand-inner"><div class="alert-card treatment"><h4>💊 Tedavi Takip Uyarısı</h4><p>Değerlerinizin hedefte olması şart:</p><ul>${trt.map(t=>`<li>${t}</li>`).join('')}</ul></div></div></div>`;}
+
+      area.innerHTML=html;
+    },50);
+  },400);
+}
+
+function goBack(){
+  const form=document.getElementById('formScreen'),result=document.getElementById('resultScreen');
+  result.classList.remove('show');
+  setTimeout(()=>{result.classList.remove('visible');result.style.display='none';form.style.display='';form.classList.remove('hiding');window.scrollTo({top:0,behavior:'auto'});},400);
+}
+</script>
+</body>
+</html>
