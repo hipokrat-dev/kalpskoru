@@ -148,10 +148,32 @@
   .disclaimer-result{text-align:center;font-size:0.62rem;color:var(--text-dim);margin-top:10px;opacity:0.4;}
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+  /* CUSTOM MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .modal-overlay.show{opacity:1;pointer-events:all;}
+  .modal-box{background:var(--card);border:1px solid rgba(230,57,70,0.4);border-radius:18px;padding:28px 24px 20px;max-width:340px;width:100%;text-align:center;transform:scale(0.88) translateY(20px);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);}
+  .modal-overlay.show .modal-box{transform:scale(1) translateY(0);}
+  .modal-icon{font-size:2.4rem;margin-bottom:10px;animation:hb 1.8s ease-in-out infinite;}
+  .modal-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--accent-light);margin-bottom:8px;}
+  .modal-body{font-size:0.83rem;color:var(--text-dim);line-height:1.6;margin-bottom:20px;}
+  .modal-body strong{color:var(--text);}
+  .modal-btn{width:100%;padding:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),#c1121f);border:none;border-radius:12px;cursor:pointer;transition:opacity 0.2s;box-shadow:0 4px 18px rgba(230,57,70,0.35);}
+  .modal-btn:hover{opacity:0.88;}
   @media(max-width:520px){.container{padding:16px 12px 24px;}.header{margin-bottom:16px;}.header h1{font-size:1.4rem;}.section{padding:14px;margin-bottom:10px;}.form-row{gap:10px;}.toggle-group{padding:8px 0;}.sub-toggle-row{margin:0 -14px;padding-left:28px;padding-right:14px;}.calc-btn{padding:12px;font-size:0.9rem;}.heart-anim-wrap{width:64px;height:64px;}.heart-svg-main{width:36px;height:36px;}.ecg-line{width:60px;height:14px;}.ecg-line svg{width:120px;height:14px;}.hero-title{font-size:1.1rem;}.score-num{font-size:1.5rem;}}
 </style>
 </head>
 <body>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-icon">❤️‍🔥</div>
+    <div class="modal-title" id="modalTitle">Eksik Bilgi</div>
+    <div class="modal-body" id="modalBody"></div>
+    <button class="modal-btn" onclick="closeModal()">Tamam, Dolduracağım</button>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- FORM -->
@@ -229,6 +251,16 @@ function miniHeart(color){
     <div class="rh-ecg"><svg viewBox="0 0 200 24" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.4"><polyline points="0,12 15,12 20,12 25,2 30,22 35,8 40,16 45,12 60,12 75,12 80,12 85,2 90,22 95,8 100,16 105,12 120,12 135,12 140,12 145,2 150,22 155,8 160,16 165,12 180,12 200,12"/></svg></div>`;
 }
 
+function showModal(title,body){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
 function calculateRisk(){
   const ageVal=document.getElementById('age').value.trim();
   const hVal=document.getElementById('height').value.trim();
@@ -237,12 +269,12 @@ function calculateRisk(){
   if(!ageVal) missing.push('Yaş');
   if(!hVal) missing.push('Boy');
   if(!wVal) missing.push('Kilo');
-  if(missing.length>0){alert('Lütfen şu alanları doldurunuz: '+missing.join(', '));return;}
+  if(missing.length>0){showModal('Eksik Bilgi','Lütfen aşağıdaki alanları doldurunuz:<br><br><strong>'+missing.map(m=>'• '+m).join('<br>')+'</strong>');return;}
   const age=parseInt(ageVal);
-  if(age<18||age>100){alert('Yaş 18-100 arasında olmalıdır.');return;}
+  if(age<18||age>100){showModal('Geçersiz Yaş','Yaş değeri <strong>18 ile 100</strong> arasında olmalıdır.');return;}
   const hCheck=parseInt(hVal),wCheck=parseInt(wVal);
-  if(hCheck<120||hCheck>220){alert('Boy 120-220 cm arasında olmalıdır.');return;}
-  if(wCheck<30||wCheck>250){alert('Kilo 30-250 kg arasında olmalıdır.');return;}
+  if(hCheck<120||hCheck>220){showModal('Geçersiz Boy','Boy değeri <strong>120 ile 220 cm</strong> arasında olmalıdır.');return;}
+  if(wCheck<30||wCheck>250){showModal('Geçersiz Kilo','Kilo değeri <strong>30 ile 250 kg</strong> arasında olmalıdır.');return;}
   const h=parseInt(document.getElementById('height').value),w=parseInt(document.getElementById('weight').value);
   const fH=document.getElementById('familyHistory').checked;
   const ht=document.getElementById('hypertension').checked,htT=document.getElementById('htTreatCheck').checked;
