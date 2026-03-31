@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kalp Sağlığı Risk Değerlendirmesi</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ff6b6b'/%3E%3Cstop offset='100%25' stop-color='%23e63946'/%3E%3C/linearGradient%3E%3Cfilter id='s'%3E%3CfeDropShadow dx='0' dy='4' stdDeviation='12' flood-color='%23e63946' flood-opacity='0.4'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='%230f1118'/%3E%3Cpath d='M256 420c-8 0-15-3-20-8C148 332 108 280 88 244c-24-44-28-88-4-124 18-28 50-44 84-44 30 0 58 14 78 38a4 4 0 007 0c20-24 48-38 78-38 34 0 66 16 84 44 24 36 20 80-4 124-20 36-60 88-148 168a28 28 0 01-20 8h13z' fill='url(%23g)' filter='url(%23s)'/%3E%3Cpath d='M170 210q20-10 40 0t40 0 40 0 40 0' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' opacity='0.5'/%3E%3Cpath d='M210 210l15-30 15 50 15-40 15 20' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round' opacity='0.9'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kalp Skoru">
+<meta name="theme-color" content="#0f1118">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0f1118;--card:#181b25;--accent:#e63946;--accent-light:#ff6b6b;--accent-glow:rgba(230,57,70,0.25);--green:#2ec4b6;--green-glow:rgba(46,196,182,0.25);--yellow:#f4a261;--blue:#6c9fff;--text:#e8e8ed;--text-dim:#8b8fa3;--border:#2a2d3a;--input-bg:#12141c;}
@@ -224,8 +230,19 @@ function miniHeart(color){
 }
 
 function calculateRisk(){
-  const age=parseInt(document.getElementById('age').value);
-  if(!age){alert('Lütfen yaşınızı giriniz.');return;}
+  const ageVal=document.getElementById('age').value.trim();
+  const hVal=document.getElementById('height').value.trim();
+  const wVal=document.getElementById('weight').value.trim();
+  const missing=[];
+  if(!ageVal) missing.push('Yaş');
+  if(!hVal) missing.push('Boy');
+  if(!wVal) missing.push('Kilo');
+  if(missing.length>0){alert('Lütfen şu alanları doldurunuz: '+missing.join(', '));return;}
+  const age=parseInt(ageVal);
+  if(age<18||age>100){alert('Yaş 18-100 arasında olmalıdır.');return;}
+  const hCheck=parseInt(hVal),wCheck=parseInt(wVal);
+  if(hCheck<120||hCheck>220){alert('Boy 120-220 cm arasında olmalıdır.');return;}
+  if(wCheck<30||wCheck>250){alert('Kilo 30-250 kg arasında olmalıdır.');return;}
   const h=parseInt(document.getElementById('height').value),w=parseInt(document.getElementById('weight').value);
   const fH=document.getElementById('familyHistory').checked;
   const ht=document.getElementById('hypertension').checked,htT=document.getElementById('htTreatCheck').checked;
@@ -251,8 +268,7 @@ function calculateRisk(){
   if(db){if(dbT){chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;score++;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
   else chg.push({t:'Kan Şekeri: Normal',ex:'',s:'ok'});
 
-  if(h&&w&&h>=100&&w>=20){const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
-  else chg.push({t:'VKİ: Girilmedi',ex:'',s:'ok'});
+  {const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
 
   if(sm){hasRisk=true;score++;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
   else chg.push({t:'Sigara: Yok',ex:'',s:'ok'});
@@ -331,7 +347,29 @@ function calculateRisk(){
 function goBack(){
   const form=document.getElementById('formScreen'),result=document.getElementById('resultScreen');
   result.classList.remove('show');
-  setTimeout(()=>{result.classList.remove('visible');result.style.display='none';form.style.display='';form.classList.remove('hiding');window.scrollTo({top:0,behavior:'auto'});},400);
+  setTimeout(()=>{
+    result.classList.remove('visible');result.style.display='none';form.style.display='';form.classList.remove('hiding');
+    // Formu sıfırla
+    document.getElementById('age').value='';
+    document.getElementById('height').value='';
+    document.getElementById('weight').value='';
+    document.getElementById('familyHistory').checked=false;
+    document.getElementById('hypertension').checked=false;
+    document.getElementById('htTreatCheck').checked=false;
+    document.getElementById('cholesterol').checked=false;
+    document.getElementById('cholTreatCheck').checked=false;
+    document.getElementById('diabetes').checked=false;
+    document.getElementById('diabTreatCheck').checked=false;
+    document.getElementById('smoking').checked=false;
+    document.getElementById('sedentary').checked=false;
+    // Sub-toggle satırlarını gizle
+    document.getElementById('htTreat').classList.remove('visible');
+    document.getElementById('cholTreat').classList.remove('visible');
+    document.getElementById('diabTreat').classList.remove('visible');
+    // BMI'yi sıfırla
+    calcBMI();
+    window.scrollTo({top:0,behavior:'auto'});
+  },400);
 }
 </script>
 </body>
