@@ -149,6 +149,33 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
+  /* WELCOME MODAL */
+  .welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.4s ease;}
+  .welcome-overlay.show{opacity:1;pointer-events:all;}
+  .welcome-box{background:linear-gradient(160deg,#1a1d27,#12141c);border:1px solid rgba(230,57,70,0.35);border-radius:24px;padding:36px 28px 28px;max-width:340px;width:100%;text-align:center;transform:scale(0.82) translateY(30px);transition:transform 0.45s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+  .welcome-overlay.show .welcome-box{transform:scale(1) translateY(0);}
+  .welcome-box::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:220px;background:radial-gradient(circle,rgba(230,57,70,0.18) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+  .welcome-heart-wrap{position:relative;width:90px;height:90px;margin:0 auto 18px;}
+  .welcome-heart-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,0.4) 0%,transparent 70%);animation:wGlow 1.8s ease-in-out infinite;}
+  @keyframes wGlow{0%,100%{transform:scale(0.8);opacity:0.5;}50%{transform:scale(1.3);opacity:1;}}
+  .welcome-heart-svg{width:52px;height:52px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 14px rgba(230,57,70,0.7));animation:wBeat 1.8s ease-in-out infinite;}
+  @keyframes wBeat{0%,100%{transform:translate(-50%,-50%) scale(1);}12%{transform:translate(-50%,-50%) scale(1.28);}24%{transform:translate(-50%,-50%) scale(1);}36%{transform:translate(-50%,-50%) scale(1.16);}48%{transform:translate(-50%,-50%) scale(1);}}
+  .welcome-particles span{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--accent-light);opacity:0;animation:wParticle 2.5s ease-in-out infinite;}
+  .welcome-particles span:nth-child(1){top:10%;left:15%;animation-delay:0s;}
+  .welcome-particles span:nth-child(2){top:5%;right:18%;animation-delay:0.6s;}
+  .welcome-particles span:nth-child(3){bottom:22%;left:10%;animation-delay:1.2s;}
+  .welcome-particles span:nth-child(4){top:30%;right:10%;animation-delay:0.9s;}
+  @keyframes wParticle{0%{opacity:0;transform:translateY(0) scale(0.5);}30%{opacity:0.8;}70%{opacity:0.4;transform:translateY(-16px) scale(1.1);}100%{opacity:0;transform:translateY(-30px) scale(0.3);}}
+  .welcome-tag{display:inline-block;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent-light);background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:20px;padding:4px 12px;margin-bottom:14px;}
+  .welcome-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;line-height:1.3;background:linear-gradient(135deg,#fff 30%,#ff9999);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;}
+  .welcome-sub{font-size:0.82rem;color:var(--text-dim);line-height:1.7;margin-bottom:24px;}
+  .welcome-sub em{color:var(--accent-light);font-style:normal;font-weight:600;}
+  .welcome-ecg{margin:0 auto 20px;width:100%;overflow:hidden;height:20px;}
+  .welcome-ecg svg{width:200%;height:20px;animation:ecg 2.4s linear infinite;}
+  .welcome-btn{width:100%;padding:14px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#e63946,#c1121f);border:none;border-radius:14px;cursor:pointer;transition:all 0.25s;box-shadow:0 6px 24px rgba(230,57,70,0.4);letter-spacing:0.02em;}
+  .welcome-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(230,57,70,0.55);}
+  .welcome-btn:active{transform:translateY(0);}
+
   /* CUSTOM MODAL */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .modal-overlay.show{opacity:1;pointer-events:all;}
@@ -164,6 +191,36 @@
 </style>
 </head>
 <body>
+<!-- WELCOME POPUP -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-box">
+    <div class="welcome-heart-wrap">
+      <div class="welcome-heart-glow"></div>
+      <div class="welcome-particles">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <svg class="welcome-heart-svg" viewBox="0 0 24 24">
+        <defs>
+          <linearGradient id="wg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff6b6b"/>
+            <stop offset="100%" stop-color="#e63946"/>
+          </linearGradient>
+        </defs>
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="url(#wg)"/>
+      </svg>
+    </div>
+    <div class="welcome-tag">Kalp Sağlığı</div>
+    <div class="welcome-title">Kalbinizi Koruyun</div>
+    <div class="welcome-ecg">
+      <svg viewBox="0 0 400 20" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5">
+        <polyline points="0,10 30,10 40,10 50,1 60,19 70,6 80,14 90,10 120,10 150,10 160,10 170,1 180,19 190,6 200,14 210,10 240,10 270,10 280,1 290,19 300,6 310,14 320,10 350,10 400,10"/>
+      </svg>
+    </div>
+    <div class="welcome-sub">Çünkü içinde <em>sevdikleriniz</em> var.</div>
+    <button class="welcome-btn" onclick="closeWelcome()">Değerlendirmeye Başla →</button>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
@@ -249,6 +306,18 @@ function miniHeart(color){
   return `<div class="glow-r"></div>
     <svg class="rh-svg" viewBox="0 0 24 24" fill="${color}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <div class="rh-ecg"><svg viewBox="0 0 200 24" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.4"><polyline points="0,12 15,12 20,12 25,2 30,22 35,8 40,16 45,12 60,12 75,12 80,12 85,2 90,22 95,8 100,16 105,12 120,12 135,12 140,12 145,2 150,22 155,8 160,16 165,12 180,12 200,12"/></svg></div>`;
+}
+
+// Welcome popup - her açılışta göster
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    document.getElementById('welcomeOverlay').classList.add('show');
+  },300);
+});
+function closeWelcome(){
+  const ov=document.getElementById('welcomeOverlay');
+  ov.style.transition='opacity 0.35s ease';
+  ov.classList.remove('show');
 }
 
 function showModal(title,body){
