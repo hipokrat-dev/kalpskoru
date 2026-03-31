@@ -1,8 +1,9 @@
-const CACHE = 'kalp-v1';
+const CACHE = 'kalp-v2';
 const FILES = [
   '/kalpskoru/',
   '/kalpskoru/index.html',
   '/kalpskoru/icon-180.png',
+  '/kalpskoru/icon-192.png',
   '/kalpskoru/icon-512.png',
   '/kalpskoru/manifest.json'
 ];
