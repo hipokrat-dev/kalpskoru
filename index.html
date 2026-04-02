@@ -188,6 +188,42 @@
   .modal-body strong{color:var(--text);}
   .modal-btn{width:100%;padding:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),#c1121f);border:none;border-radius:12px;cursor:pointer;transition:opacity 0.2s;box-shadow:0 4px 18px rgba(230,57,70,0.35);}
   .modal-btn:hover{opacity:0.88;}
+
+  /* SONUÇ POP-UP */
+  .rpop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.35s ease;}
+  .rpop-overlay.show{opacity:1;pointer-events:all;}
+  .rpop-box{background:linear-gradient(160deg,#1a1d27,#12141c);border:1px solid rgba(230,57,70,0.3);border-radius:24px;padding:28px 24px 22px;max-width:360px;width:100%;text-align:center;transform:scale(0.85) translateY(24px);transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;max-height:90vh;overflow-y:auto;}
+  .rpop-overlay.show .rpop-box{transform:scale(1) translateY(0);}
+  .rpop-box::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:260px;height:260px;background:radial-gradient(circle,rgba(230,57,70,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+  .rpop-heart{width:64px;height:64px;margin:0 auto 14px;position:relative;}
+  .rpop-heart-glow{position:absolute;inset:0;border-radius:50%;animation:glowP 1.8s ease-in-out infinite;}
+  .rpop-heart svg{width:38px;height:38px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:wBeat 1.8s ease-in-out infinite;}
+  .rpop-pct-wrap{margin:6px 0 10px;}
+  .rpop-pct{font-family:'Playfair Display',serif;font-size:3.6rem;font-weight:900;line-height:1;}
+  .rpop-pct-label{font-size:0.75rem;color:var(--text-dim);margin-top:3px;letter-spacing:0.04em;}
+  .rpop-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:900;line-height:1.35;margin:10px 0 6px;}
+  .rpop-subtitle{font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin-bottom:14px;}
+  .rpop-divider{height:1px;background:var(--border);margin:12px 0;}
+  .rpop-risk-title{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-light);margin-bottom:8px;text-align:left;}
+  .rpop-risk-list{text-align:left;margin-bottom:12px;}
+  .rpop-risk-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:0.78rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.05);}
+  .rpop-risk-item:last-child{border-bottom:none;}
+  .rpop-risk-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-light);margin-top:5px;flex-shrink:0;}
+  .rpop-kontrol{background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:10px;padding:10px 14px;margin:12px 0;text-align:left;}
+  .rpop-kontrol-title{font-size:0.72rem;font-weight:700;color:var(--green);margin-bottom:3px;}
+  .rpop-kontrol-text{font-size:0.74rem;color:var(--text-dim);line-height:1.5;}
+  .rpop-btn{width:100%;padding:13px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:700;color:#fff;border:none;border-radius:12px;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
+  .rpop-btn:hover{opacity:0.88;}
+  .rpop-low .rpop-pct{color:var(--green);}
+  .rpop-low .rpop-heart-glow{background:radial-gradient(circle,rgba(46,196,182,0.35) 0%,transparent 70%);}
+  .rpop-low .rpop-btn{background:linear-gradient(135deg,#1a8a7d,var(--green));box-shadow:0 4px 18px rgba(46,196,182,0.3);}
+  .rpop-mid .rpop-pct{color:var(--yellow);}
+  .rpop-mid .rpop-heart-glow{background:radial-gradient(circle,rgba(244,162,97,0.35) 0%,transparent 70%);}
+  .rpop-mid .rpop-btn{background:linear-gradient(135deg,#c1701a,var(--yellow));box-shadow:0 4px 18px rgba(244,162,97,0.3);}
+  .rpop-high .rpop-pct{color:var(--accent-light);}
+  .rpop-high .rpop-heart-glow{background:radial-gradient(circle,rgba(230,57,70,0.4) 0%,transparent 70%);}
+  .rpop-high .rpop-btn{background:linear-gradient(135deg,var(--accent),#c1121f);box-shadow:0 4px 18px rgba(230,57,70,0.35);}
+
   @media(max-width:520px){.container{padding:16px 12px 24px;}.header{margin-bottom:16px;}.header h1{font-size:1.4rem;}.section{padding:14px;margin-bottom:10px;}.form-row{gap:10px;}.toggle-group{padding:8px 0;}.sub-toggle-row{margin:0 -14px;padding-left:28px;padding-right:14px;}.calc-btn{padding:12px;font-size:0.9rem;}.heart-anim-wrap{width:64px;height:64px;}.heart-svg-main{width:36px;height:36px;}.ecg-line{width:60px;height:14px;}.ecg-line svg{width:120px;height:14px;}.hero-title{font-size:1.1rem;}.score-num{font-size:1.5rem;}}
 </style>
 </head>
@@ -219,6 +255,29 @@
     </div>
     <div class="welcome-sub">Çünkü içinde <em>sevdikleriniz</em> var.</div>
     <button class="welcome-btn" onclick="closeWelcome()">Değerlendirmeye Başla →</button>
+  </div>
+</div>
+
+<!-- SONUÇ POP-UP -->
+<div class="rpop-overlay" id="rpopOverlay" onclick="if(event.target===this)closeRpop()">
+  <div class="rpop-box" id="rpopBox">
+    <div class="rpop-heart">
+      <div class="rpop-heart-glow"></div>
+      <svg viewBox="0 0 24 24"><defs><linearGradient id="rhg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#e63946"/></linearGradient></defs><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="url(#rhg)"/></svg>
+    </div>
+    <div class="rpop-pct-wrap">
+      <div class="rpop-pct" id="rpopPct">%0</div>
+      <div class="rpop-pct-label">Kalp ve Damar Hastalığı Risk Skoru</div>
+    </div>
+    <div class="rpop-title" id="rpopTitle"></div>
+    <div class="rpop-subtitle" id="rpopSubtitle"></div>
+    <div class="rpop-divider"></div>
+    <div id="rpopRiskSection"></div>
+    <div class="rpop-kontrol">
+      <div class="rpop-kontrol-title">🩺 Düzenli Sağlık Kontrolü</div>
+      <div class="rpop-kontrol-text">Yılda en az bir kez tam kan sayımı, lipid profili ve kan basıncı ölçümü yaptırın. Erken teşhis hayat kurtarır.</div>
+    </div>
+    <button class="rpop-btn" onclick="closeRpop()">Detayları Gör →</button>
   </div>
 </div>
 
@@ -442,8 +501,66 @@ function calculateRisk(){
       if(trt.length>0){html+=`<div class="expand-btn" onclick="toggleExpand(this,'trtC')"><div class="expand-btn-left"><span class="expand-btn-icon">💊</span><span class="expand-btn-text">Tedavi Takibi</span><span class="expand-btn-count treat">${trt.length}</span></div><span class="expand-arrow">▼</span></div><div class="expand-content" id="trtC"><div class="expand-inner"><div class="alert-card treatment"><h4>💊 Tedavi Takip Uyarısı</h4><p>Değerlerinizin hedefte olması şart:</p><ul>${trt.map(t=>`<li>${t}</li>`).join('')}</ul></div></div></div>`;}
 
       area.innerHTML=html;
+
+      // Sonuç pop-up'ı — risk faktörlerini topla
+      const riskLabels = [...unc, ...chg]
+        .filter(f => f.s === 'risk')
+        .map(f => f.t);
+      setTimeout(()=>{ showRpop(score, maxP, age, riskLabels); }, 800);
+
     },50);
   },400);
+}
+
+function showRpop(score, maxP, age, riskItems){
+  const rawPct = Math.round((score / maxP) * 100);
+  const ageMod = age >= 40 ? 10 : -10;
+  const pct = Math.min(100, Math.max(0, rawPct + ageMod));
+
+  let tier, title, subtitle;
+  if(pct <= 30){
+    tier = 'low';
+    title = 'Kalp sağlığınız şu an iyi görünüyor';
+    subtitle = 'Mevcut tabloyu korumak için sağlıklı yaşam alışkanlıklarını sürdürün ve düzenli kontrollerinizi aksatmayın.';
+  } else if(pct <= 60){
+    tier = 'mid';
+    title = 'Kalp ve damar sağlığınızı yakından takip edin';
+    subtitle = 'Tespit edilen risk faktörleri için bir dahiliye uzmanı veya kardiyolog ile görüşmenizi öneririz.';
+  } else {
+    tier = 'high';
+    title = 'Kalp ve damar hastalıkları açısından ciddi risk faktörleriniz mevcut';
+    subtitle = 'Vakit kaybetmeden bir kardiyolog veya dahiliye uzmanına başvurunuz. Erken müdahale hayat kurtarır.';
+  }
+
+  const box = document.getElementById('rpopBox');
+  box.className = 'rpop-box rpop-' + tier;
+  document.getElementById('rpopPct').textContent = '%' + pct;
+  document.getElementById('rpopTitle').textContent = title;
+  document.getElementById('rpopSubtitle').textContent = subtitle;
+
+  let riskHtml = '';
+  if(riskItems.length > 0){
+    riskHtml = `<div class="rpop-risk-title">Öne Çıkan Risk Faktörleri</div><div class="rpop-risk-list">` +
+      riskItems.map(r => `<div class="rpop-risk-item"><div class="rpop-risk-dot"></div><span>${r}</span></div>`).join('') +
+      `</div>`;
+  }
+  document.getElementById('rpopRiskSection').innerHTML = riskHtml;
+
+  // Animate %
+  const pctEl = document.getElementById('rpopPct');
+  let cur = 0;
+  const step = Math.ceil(pct / 40);
+  const anim = setInterval(()=>{
+    cur = Math.min(cur + step, pct);
+    pctEl.textContent = '%' + cur;
+    if(cur >= pct) clearInterval(anim);
+  }, 35);
+
+  document.getElementById('rpopOverlay').classList.add('show');
+}
+
+function closeRpop(){
+  document.getElementById('rpopOverlay').classList.remove('show');
 }
 
 function goBack(){
