@@ -547,9 +547,7 @@ function calculateRisk(){
 }
 
 function showRpop(score, maxP, age, riskItems){
-  const rawPct = Math.round((score / maxP) * 100);
-  const ageMod = age >= 40 ? 10 : -10;
-  const pct = Math.min(100, Math.max(0, rawPct + ageMod));
+  const pct = Math.round((score / maxP) * 100);
 
   let tier, title, subtitle;
   if(pct <= 30){
