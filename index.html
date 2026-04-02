@@ -201,6 +201,24 @@
   .rpop-pct-wrap{margin:6px 0 10px;}
   .rpop-pct{font-family:'Playfair Display',serif;font-size:3.6rem;font-weight:900;line-height:1;}
   .rpop-pct-label{font-size:0.75rem;color:var(--text-dim);margin-top:3px;letter-spacing:0.04em;}
+  .rpop-tips{text-align:left;margin-bottom:12px;}
+  .rpop-tip-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.8rem;color:var(--text);line-height:1.5;}
+  .rpop-tip-item:last-child{border-bottom:none;}
+  .rpop-tip-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+  /* Aile öyküsü soru işareti */
+  .fh-info-btn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(108,159,255,0.2);border:1px solid rgba(108,159,255,0.4);color:var(--blue);font-size:0.65rem;font-weight:700;cursor:pointer;margin-left:6px;flex-shrink:0;transition:all 0.2s;vertical-align:middle;}
+  .fh-info-btn:hover{background:rgba(108,159,255,0.35);}
+  /* Aile öyküsü açıklama pop-up */
+  .fhpop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:10001;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .fhpop-overlay.show{opacity:1;pointer-events:all;}
+  .fhpop-box{background:linear-gradient(160deg,#1a1d27,#12141c);border:1px solid rgba(108,159,255,0.3);border-radius:20px;padding:24px 20px;max-width:320px;width:100%;transform:scale(0.88) translateY(16px);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);position:relative;}
+  .fhpop-overlay.show .fhpop-box{transform:scale(1) translateY(0);}
+  .fhpop-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.07);border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+  .fhpop-close:hover{background:rgba(255,255,255,0.14);}
+  .fhpop-icon{font-size:2rem;text-align:center;margin-bottom:10px;}
+  .fhpop-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:var(--blue);text-align:center;margin-bottom:10px;}
+  .fhpop-body{font-size:0.8rem;color:var(--text-dim);line-height:1.7;text-align:center;}
+  .fhpop-body strong{color:var(--text);}
   .rpop-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:900;line-height:1.35;margin:10px 0 6px;}
   .rpop-subtitle{font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin-bottom:14px;}
   .rpop-divider{height:1px;background:var(--border);margin:12px 0;}
@@ -258,6 +276,22 @@
   </div>
 </div>
 
+<!-- AİLE ÖYKÜSÜ AÇIKLAMA POP-UP -->
+<div class="fhpop-overlay" id="fhpopOverlay" onclick="if(event.target===this)closeFhpop()">
+  <div class="fhpop-box">
+    <button class="fhpop-close" onclick="closeFhpop()">✕</button>
+    <div class="fhpop-icon">🧬</div>
+    <div class="fhpop-title">Aile Öyküsü Nedir?</div>
+    <div class="fhpop-body">
+      <strong>Birinci derece akrabalarınızda</strong> (anne, baba, kardeş) aşağıdaki hastalıkların bulunması aile öyküsü sayılır:<br><br>
+      <strong>• Yüksek tansiyon (hipertansiyon)</strong><br>
+      <strong>• Kalp ve koroner damar hastalığı</strong><br>
+      <strong>• Geçirilmiş kalp krizi veya felç</strong><br><br>
+      Bu hastalıkların ailede görülmesi, genetik yatkınlık nedeniyle sizin riskinizi de artırabilir.
+    </div>
+  </div>
+</div>
+
 <!-- SONUÇ POP-UP -->
 <div class="rpop-overlay" id="rpopOverlay" onclick="if(event.target===this)closeRpop()">
   <div class="rpop-box" id="rpopBox">
@@ -265,7 +299,7 @@
       <div class="rpop-heart-glow"></div>
       <svg viewBox="0 0 24 24"><defs><linearGradient id="rhg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#e63946"/></linearGradient></defs><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="url(#rhg)"/></svg>
     </div>
-    <div class="rpop-pct-wrap">
+    <div class="rpop-pct-wrap" id="rpopPctWrap">
       <div class="rpop-pct" id="rpopPct">%0</div>
       <div class="rpop-pct-label">Kalp ve Damar Hastalığı Risk Skoru</div>
     </div>
@@ -309,7 +343,7 @@
     <div class="section">
       <div class="section-title">Değiştirilemez Risk Faktörleri</div>
       <div class="form-group" style="max-width:160px;margin-bottom:12px;"><label>Yaş</label><input type="number" id="age" placeholder="Ör: 52" min="18" max="100"></div>
-      <div class="toggle-group"><div><div class="toggle-label">Aile Öyküsü</div><div class="toggle-sublabel">Birinci derece akrabada kardiyovasküler hastalık</div></div><label class="toggle"><input type="checkbox" id="familyHistory"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Aile Öyküsü <span class="fh-info-btn" onclick="openFhpop()">?</span></div><div class="toggle-sublabel">Birinci derece akrabada kardiyovasküler hastalık</div></div><label class="toggle"><input type="checkbox" id="familyHistory"><span class="toggle-slider"></span></label></div>
     </div>
 
     <div class="section">
@@ -330,7 +364,7 @@
       <div class="toggle-group"><div><div class="toggle-label">Yüksek Şeker (Diyabet)</div></div><label class="toggle"><input type="checkbox" id="diabetes" onchange="toggleSub('diabetes','diabTreat')"><span class="toggle-slider"></span></label></div>
       <div class="sub-toggle-row" id="diabTreat"><div><div class="toggle-label">💊 Tedavi alıyorum</div></div><label class="toggle"><input type="checkbox" id="diabTreatCheck"><span class="toggle-slider"></span></label></div>
       <div class="toggle-group"><div><div class="toggle-label">Sigara Kullanımı</div></div><label class="toggle"><input type="checkbox" id="smoking"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-group"><div><div class="toggle-label">Fiziksel İnaktivite</div></div><label class="toggle"><input type="checkbox" id="sedentary"><span class="toggle-slider"></span></label></div>
+      <div class="toggle-group"><div><div class="toggle-label">Hareketsizlik</div></div><label class="toggle"><input type="checkbox" id="sedentary"><span class="toggle-slider"></span></label></div>
     </div>
 
     <button class="calc-btn" onclick="calculateRisk()">❤️ Riskimi Hesapla</button>
@@ -521,7 +555,7 @@ function showRpop(score, maxP, age, riskItems){
   if(pct <= 30){
     tier = 'low';
     title = 'Kalp sağlığınız şu an iyi görünüyor';
-    subtitle = 'Mevcut tabloyu korumak için sağlıklı yaşam alışkanlıklarını sürdürün ve düzenli kontrollerinizi aksatmayın.';
+    subtitle = 'Uzun ve sağlıklı bir yaşam için bu tabloyu koruyun.';
   } else if(pct <= 60){
     tier = 'mid';
     title = 'Kalp ve damar sağlığınızı yakından takip edin';
@@ -534,30 +568,45 @@ function showRpop(score, maxP, age, riskItems){
 
   const box = document.getElementById('rpopBox');
   box.className = 'rpop-box rpop-' + tier;
-  document.getElementById('rpopPct').textContent = '%' + pct;
   document.getElementById('rpopTitle').textContent = title;
   document.getElementById('rpopSubtitle').textContent = subtitle;
 
-  let riskHtml = '';
-  if(riskItems.length > 0){
-    riskHtml = `<div class="rpop-risk-title">Öne Çıkan Risk Faktörleri</div><div class="rpop-risk-list">` +
-      riskItems.map(r => `<div class="rpop-risk-item"><div class="rpop-risk-dot"></div><span>${r}</span></div>`).join('') +
-      `</div>`;
-  }
-  document.getElementById('rpopRiskSection').innerHTML = riskHtml;
-
-  // Animate %
+  const pctWrap = document.getElementById('rpopPctWrap');
   const pctEl = document.getElementById('rpopPct');
-  let cur = 0;
-  const step = Math.ceil(pct / 40);
-  const anim = setInterval(()=>{
-    cur = Math.min(cur + step, pct);
-    pctEl.textContent = '%' + cur;
-    if(cur >= pct) clearInterval(anim);
-  }, 35);
+
+  if(tier === 'low'){
+    pctWrap.style.display = 'none';
+    document.getElementById('rpopRiskSection').innerHTML = `
+      <div class="rpop-risk-title">Sağlıklı Yaşam Önerileri</div>
+      <div class="rpop-tips">
+        <div class="rpop-tip-item"><span class="rpop-tip-icon">🥗</span><span>Dengeli beslenin; sebze, meyve, tam tahıl ve sağlıklı yağları tercih edin.</span></div>
+        <div class="rpop-tip-item"><span class="rpop-tip-icon">🚶</span><span>Hareketsiz kalmayın; haftada en az 150 dakika orta yoğunlukta egzersiz yapın.</span></div>
+        <div class="rpop-tip-item"><span class="rpop-tip-icon">🩺</span><span>Yılda bir sağlık kontrolünüzü yaptırmayı ihmal etmeyin.</span></div>
+      </div>`;
+  } else {
+    pctWrap.style.display = '';
+    let cur = 0;
+    const step = Math.ceil(pct / 40);
+    const anim = setInterval(()=>{
+      cur = Math.min(cur + step, pct);
+      pctEl.textContent = '%' + cur;
+      if(cur >= pct) clearInterval(anim);
+    }, 35);
+
+    let riskHtml = '';
+    if(riskItems.length > 0){
+      riskHtml = `<div class="rpop-risk-title">Öne Çıkan Risk Faktörleri</div><div class="rpop-risk-list">` +
+        riskItems.map(r => `<div class="rpop-risk-item"><div class="rpop-risk-dot"></div><span>${r}</span></div>`).join('') +
+        `</div>`;
+    }
+    document.getElementById('rpopRiskSection').innerHTML = riskHtml;
+  }
 
   document.getElementById('rpopOverlay').classList.add('show');
 }
+
+function openFhpop(){ document.getElementById('fhpopOverlay').classList.add('show'); }
+function closeFhpop(){ document.getElementById('fhpopOverlay').classList.remove('show'); }
 
 function closeRpop(){
   document.getElementById('rpopOverlay').classList.remove('show');
