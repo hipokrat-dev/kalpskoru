@@ -445,35 +445,43 @@ function calculateRisk(){
   const db=document.getElementById('diabetes').checked,dbT=document.getElementById('diabTreatCheck').checked;
   const sm=document.getElementById('smoking').checked,sd=document.getElementById('sedentary').checked;
 
-  let hasRisk=false;const maxP=8;let score=0;
+  let hasRisk=false; let pct=0;
   const unc=[],chg=[],doc=[],trt=[];
 
-  if(age>=40){hasRisk=true;score++;unc.push({t:`Yaş: ${age}`,ex:'40 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
+  // Yaş katkısı
+  let agePts=0;
+  if(age>=60) agePts=18;
+  else if(age>=50) agePts=12;
+  else if(age>=40) agePts=5;
+
+  if(age>=40){hasRisk=true;unc.push({t:`Yaş: ${age}`,ex:'40 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
   else unc.push({t:`Yaş: ${age}`,ex:'40 yaş altı — yaşa bağlı risk düşük.',s:'ok'});
 
-  if(fH){hasRisk=true;score++;unc.push({t:'Aile Öyküsü: Var',ex:'Ailede kalp hastalığı öyküsü genetik yatkınlık nedeniyle riskinizi artırır.',s:'risk'});}
+  if(fH){hasRisk=true;pct+=20;unc.push({t:'Aile Öyküsü: Var',ex:'Ailede kalp hastalığı öyküsü genetik yatkınlık nedeniyle riskinizi artırır.',s:'risk'});}
   else unc.push({t:'Aile Öyküsü: Yok',ex:'',s:'ok'});
 
-  if(ht){if(htT){chg.push({t:'Tansiyon — Tedavi Altında',ex:'Hedef değerlerde olduğunuzdan emin olun.',s:'treated'});trt.push('Tansiyon — düzenli ölçüm ve hedef takibi');}else{hasRisk=true;score++;chg.push({t:'Yüksek Tansiyon',ex:'Damar duvarlarına zarar vererek kalp krizi riskini artırır.',s:'risk'});doc.push('Yüksek tansiyon — tedavi değerlendirmesi');}}
+  if(ht){if(htT){pct+=8;chg.push({t:'Tansiyon — Tedavi Altında',ex:'Hedef değerlerde olduğunuzdan emin olun.',s:'treated'});trt.push('Tansiyon — düzenli ölçüm ve hedef takibi');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Tansiyon',ex:'Damar duvarlarına zarar vererek kalp krizi riskini artırır.',s:'risk'});doc.push('Yüksek tansiyon — tedavi değerlendirmesi');}}
   else chg.push({t:'Tansiyon: Normal',ex:'',s:'ok'});
 
-  if(ch){if(chT){chg.push({t:'Kolesterol — Tedavi Altında',ex:'LDL hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Kolesterol — lipid profili kontrolü');}else{hasRisk=true;score++;chg.push({t:'Yüksek Kolesterol',ex:'Damar tıkanıklığına zemin hazırlar.',s:'risk'});doc.push('Yüksek kolesterol — tedavi planı');}}
+  if(ch){if(chT){pct+=6;chg.push({t:'Kolesterol — Tedavi Altında',ex:'LDL hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Kolesterol — lipid profili kontrolü');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Kolesterol',ex:'Damar tıkanıklığına zemin hazırlar.',s:'risk'});doc.push('Yüksek kolesterol — tedavi planı');}}
   else chg.push({t:'Kolesterol: Normal',ex:'',s:'ok'});
 
-  if(db){if(dbT){chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;score++;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
+  if(db){if(dbT){pct+=8;chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
   else chg.push({t:'Kan Şekeri: Normal',ex:'',s:'ok'});
 
-  {const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;score++;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
+  {const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;pct+=10;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;pct+=5;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
 
-  if(sm){hasRisk=true;score++;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
+  if(sm){hasRisk=true;pct+=20;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
   else chg.push({t:'Sigara: Yok',ex:'',s:'ok'});
 
-  if(sd){hasRisk=true;score++;chg.push({t:'Fiziksel İnaktivite',ex:'Birçok risk faktörünü dolaylı artırır.',s:'risk'});doc.push('İnaktivite — egzersiz planı');}
+  if(sd){hasRisk=true;pct+=8;chg.push({t:'Hareketsizlik',ex:'Birçok risk faktörünü dolaylı artırır.',s:'risk'});doc.push('Hareketsizlik — egzersiz planı');}
   else chg.push({t:'Aktif Yaşam',ex:'',s:'ok'});
 
-  const riskCount=score;
-  let lvlClass=score<=2?'low':score<=5?'mid':'high';
-  let lvlText=score<=2?'Düşük Risk':score<=5?'Orta Risk':'Yüksek Risk';
+  pct = Math.min(100, pct + agePts);
+
+  const riskCount = [...unc,...chg].filter(f=>f.s==='risk').length;
+  let lvlClass=pct<=30?'low':pct<=60?'mid':'high';
+  let lvlText=pct<=30?'Düşük Risk':pct<=60?'Orta Risk':'Yüksek Risk';
 
   // Render
   const form=document.getElementById('formScreen'),result=document.getElementById('resultScreen');
@@ -496,28 +504,24 @@ function calculateRisk(){
       }
 
       // Score card
-      const dots=Array.from({length:maxP},(_, i)=>{
-        const filled=i<score;
-        return `<div class="score-dot${filled?' filled '+lvlClass:''}"></div>`;
-      }).join('');
 
       document.getElementById('scoreArea').innerHTML=`
         <div class="score-card">
           <div class="score-header">
             <span class="score-label">Risk Skoru</span>
-            <div><span class="score-num ${lvlClass}" id="animNum">0</span><span class="score-max"> / ${maxP}</span></div>
+            <div><span class="score-num ${lvlClass}" id="animNum">%0</span></div>
           </div>
           <div class="score-bar-bg"><div class="score-bar-fill ${lvlClass}" id="scoreBar"></div></div>
-          <div class="score-dots">${dots}</div>
-          <div style="text-align:center;margin-top:4px;"><span class="score-level-tag ${lvlClass}">${lvlText}</span></div>
+          <div style="text-align:center;margin-top:10px;"><span class="score-level-tag ${lvlClass}">${lvlText}</span></div>
         </div>`;
 
       // Animate bar & number
       setTimeout(()=>{
-        document.getElementById('scoreBar').style.width=(score/maxP*100)+'%';
+        document.getElementById('scoreBar').style.width=pct+'%';
         const numEl=document.getElementById('animNum');
         let cur=0;
-        const cnt=setInterval(()=>{cur++;if(cur>=score){cur=score;clearInterval(cnt);}numEl.textContent=cur;},100);
+        const step=Math.ceil(pct/40);
+        const cnt=setInterval(()=>{cur=Math.min(cur+step,pct);numEl.textContent='%'+cur;if(cur>=pct)clearInterval(cnt);},40);
       },100);
 
       // Expandable sections
@@ -540,14 +544,13 @@ function calculateRisk(){
       const riskLabels = [...unc, ...chg]
         .filter(f => f.s === 'risk')
         .map(f => f.t);
-      setTimeout(()=>{ showRpop(score, maxP, age, riskLabels); }, 800);
+      setTimeout(()=>{ showRpop(pct, riskLabels); }, 800);
 
     },50);
   },400);
 }
 
-function showRpop(score, maxP, age, riskItems){
-  const pct = Math.round((score / maxP) * 100);
+function showRpop(pct, riskItems){
 
   let tier, title, subtitle;
   if(pct <= 30){
