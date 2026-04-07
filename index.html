@@ -445,37 +445,40 @@ function calculateRisk(){
   const db=document.getElementById('diabetes').checked,dbT=document.getElementById('diabTreatCheck').checked;
   const sm=document.getElementById('smoking').checked,sd=document.getElementById('sedentary').checked;
 
-  let hasRisk=false; let pct=0;
+  let hasRisk=false; let pct=0; let ekRiskSay=0;
   const unc=[],chg=[],doc=[],trt=[];
 
-  // Yaş katkısı
+  // Temel puan — yaş (değiştirilemez)
   let agePts=0;
-  if(age>=60) agePts=18;
-  else if(age>=50) agePts=12;
-  else if(age>=40) agePts=5;
-
-  if(age>=40){hasRisk=true;unc.push({t:`Yaş: ${age}`,ex:'40 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
+  if(age>=60){agePts=40;hasRisk=true;unc.push({t:`Yaş: ${age}`,ex:'60 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
+  else if(age>=50){agePts=30;hasRisk=true;unc.push({t:`Yaş: ${age}`,ex:'50 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
+  else if(age>=40){agePts=20;hasRisk=true;unc.push({t:`Yaş: ${age}`,ex:'40 yaş üzerinde kardiyovasküler hastalık riski belirgin şekilde artar.',s:'risk'});}
   else unc.push({t:`Yaş: ${age}`,ex:'40 yaş altı — yaşa bağlı risk düşük.',s:'ok'});
 
+  // Temel puan — aile öyküsü (değiştirilemez)
   if(fH){hasRisk=true;pct+=20;unc.push({t:'Aile Öyküsü: Var',ex:'Ailede kalp hastalığı öyküsü genetik yatkınlık nedeniyle riskinizi artırır.',s:'risk'});}
   else unc.push({t:'Aile Öyküsü: Yok',ex:'',s:'ok'});
 
-  if(ht){if(htT){pct+=8;chg.push({t:'Tansiyon — Tedavi Altında',ex:'Hedef değerlerde olduğunuzdan emin olun.',s:'treated'});trt.push('Tansiyon — düzenli ölçüm ve hedef takibi');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Tansiyon',ex:'Damar duvarlarına zarar vererek kalp krizi riskini artırır.',s:'risk'});doc.push('Yüksek tansiyon — tedavi değerlendirmesi');}}
+  // Ek riskler (değiştirilebilir)
+  if(ht){if(htT){pct+=4;chg.push({t:'Tansiyon — Tedavi Altında',ex:'Hedef değerlerde olduğunuzdan emin olun.',s:'treated'});trt.push('Tansiyon — düzenli ölçüm ve hedef takibi');}else{hasRisk=true;pct+=10;ekRiskSay++;chg.push({t:'Yüksek Tansiyon',ex:'Damar duvarlarına zarar vererek kalp krizi riskini artırır.',s:'risk'});doc.push('Yüksek tansiyon — tedavi değerlendirmesi');}}
   else chg.push({t:'Tansiyon: Normal',ex:'',s:'ok'});
 
-  if(ch){if(chT){pct+=6;chg.push({t:'Kolesterol — Tedavi Altında',ex:'LDL hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Kolesterol — lipid profili kontrolü');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Kolesterol',ex:'Damar tıkanıklığına zemin hazırlar.',s:'risk'});doc.push('Yüksek kolesterol — tedavi planı');}}
+  if(ch){if(chT){pct+=3;chg.push({t:'Kolesterol — Tedavi Altında',ex:'LDL hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Kolesterol — lipid profili kontrolü');}else{hasRisk=true;pct+=10;ekRiskSay++;chg.push({t:'Yüksek Kolesterol',ex:'Damar tıkanıklığına zemin hazırlar.',s:'risk'});doc.push('Yüksek kolesterol — tedavi planı');}}
   else chg.push({t:'Kolesterol: Normal',ex:'',s:'ok'});
 
-  if(db){if(dbT){pct+=8;chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;pct+=20;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
+  if(db){if(dbT){pct+=4;chg.push({t:'Diyabet — Tedavi Altında',ex:'HbA1c hedef değerde olduğunuzdan emin olun.',s:'treated'});trt.push('Diyabet — HbA1c ve kan şekeri takibi');}else{hasRisk=true;pct+=10;ekRiskSay++;chg.push({t:'Yüksek Şeker (Diyabet)',ex:'Kalp hastalığı riskini 2-4 kat artırır.',s:'risk'});doc.push('Diyabet — kan şekeri regülasyonu');}}
   else chg.push({t:'Kan Şekeri: Normal',ex:'',s:'ok'});
 
-  {const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;pct+=10;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;pct+=5;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
+  {const bmi=w/((h/100)**2),b=bmi.toFixed(1);if(bmi>=30){hasRisk=true;pct+=5;ekRiskSay++;chg.push({t:`VKİ: ${b} — Obez`,ex:'Metabolik riskleri artırır.',s:'risk'});doc.push('Obezite — kilo yönetimi');}else if(bmi>=25){hasRisk=true;pct+=3;ekRiskSay++;chg.push({t:`VKİ: ${b} — Kilolu`,ex:'Risk faktörlerini artırabilir.',s:'risk'});}else chg.push({t:`VKİ: ${b} — Normal`,ex:'',s:'ok'});}
 
-  if(sm){hasRisk=true;pct+=20;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
+  if(sm){hasRisk=true;pct+=8;ekRiskSay++;chg.push({t:'Sigara: Aktif',ex:'Kalp krizi riskini 2-4 kat artırır.',s:'risk'});doc.push('Sigara — bırakma desteği');}
   else chg.push({t:'Sigara: Yok',ex:'',s:'ok'});
 
-  if(sd){hasRisk=true;pct+=8;chg.push({t:'Hareketsizlik',ex:'Birçok risk faktörünü dolaylı artırır.',s:'risk'});doc.push('Hareketsizlik — egzersiz planı');}
+  if(sd){hasRisk=true;pct+=4;ekRiskSay++;chg.push({t:'Hareketsizlik',ex:'Birçok risk faktörünü dolaylı artırır.',s:'risk'});doc.push('Hareketsizlik — egzersiz planı');}
   else chg.push({t:'Aktif Yaşam',ex:'',s:'ok'});
+
+  // 2+ değiştirilebilir risk bir arada → bonus +10
+  if(ekRiskSay>=2) pct+=10;
 
   pct = Math.min(100, pct + agePts);
 
